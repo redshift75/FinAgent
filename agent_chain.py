@@ -4,12 +4,34 @@ import time
 # LangChain imports
 from langchain_openai import ChatOpenAI
 from langchain_neo4j import Neo4jGraph, GraphCypherQAChain
+from langchain.prompts.prompt import PromptTemplate
 
 # Environment setup (replace with your actual credentials)
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "your-openai-api-key")
 NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
 NEO4J_USER = os.environ.get("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "neoneoneo")
+
+CYPHER_GENERATOR_TEMPLATE = """
+You are an expert Neo4j Cypher translator who understands the question in english and convert to Cypher strictly based on the Neo4j Schema provided and following the instructions below:
+<instructions>
+* Use aliases to refer the node or relationship in the generated Cypher query
+* Generate Cypher query compatible ONLY for Neo4j Version 5
+* Do not use EXISTS, SIZE keywords in the cypher. Use alias when using the WITH keyword
+* Try to avoid using node labels in the Cypher query
+* Use only Nodes and relationships mentioned in the schema
+* Always do a case-insensitive and fuzzy search for any properties related search. Eg: to search for a Person name use `toLower(p.name) contains 'neo4j'`
+</instructions>
+
+Strictly use this Schema for Cypher generation:
+<schema>
+{schema}
+</schema>
+
+H: {question}
+
+A:
+"""
 
 # Initialize LLM with shorter timeout
 llm = ChatOpenAI(
@@ -57,12 +79,12 @@ def get_graph_schema():
         schema += """
         The knowledge graph has the following structure:
         - Nodes with the following categories:
-            - ORG: Organizations other than government or regulatory bodies (e.g., "Apple Inc.")
+            - ORG: Groups other than government or regulatory bodies (e.g., "Suppliers")
             - ORG_GOV: Government bodies (e.g., "United States Government")
             - ORG_REG: Regulatory bodies (e.g., "Federal Reserve")
             - PERSON: Individuals (e.g., "Elon Musk")
             - GPE: Geopolitical entities such as countries, cities, etc. (e.g., "Germany")
-            - COMP: Companies (e.g., "Google")
+            - COMP: Companies (e.g., "Apple Inc.")
             - PRODUCT: Products or services (e.g., "iPhone")
             - EVENT: Specific and Material Events (e.g., "Olympic Games", "Covid-19")
             - SECTOR: Company sectors or industries (e.g., "Technology sector")
@@ -90,6 +112,9 @@ def get_graph_schema():
     except Exception as e:
         return f"Error exploring graph structure: {str(e)}"
 
+schema = get_graph_schema()
+CYPHER_GENERATION_PROMPT = PromptTemplate(input_variables=['schema','question'], validate_template=True, template=CYPHER_GENERATOR_TEMPLATE)
+
 # Initialize the GraphCypherQAChain
 graph_qa_chain = None
 if graph:
@@ -97,7 +122,7 @@ if graph:
     graph_qa_chain = GraphCypherQAChain.from_llm(
         llm=llm,
         graph=graph,
-        schema=graph_schema,
+        cypher_prompt=CYPHER_GENERATION_PROMPT,
         verbose=True,
         return_intermediate_steps=True,
         allow_dangerous_requests=True,

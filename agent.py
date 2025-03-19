@@ -77,12 +77,12 @@ class KnowledgeGraphQueryTool(BaseTool):
     description: str = """Use this tool to query the Neo4j knowledge graph about economic concepts, relationships, and data.
         The knowledge graph has the following structure:
         - Nodes with the following categories:
-            - ORG: Organizations other than government or regulatory bodies (e.g., "Apple Inc.")
+            - ORG: Organizations other than government or regulatory bodies (e.g., "Suppliers")
             - ORG_GOV: Government bodies (e.g., "United States Government")
             - ORG_REG: Regulatory bodies (e.g., "Federal Reserve")
-            - PERSON: Individuals (e.g., "Elon Musk")
+            - PERSON: Individuals (e.g., "Donald Trump")
             - GPE: Geopolitical entities such as countries, cities, etc. (e.g., "Germany")
-            - COMP: Companies (e.g., "Google")
+            - COMP: Companies (e.g., "Apple Inc.")
             - PRODUCT: Products or services (e.g., "iPhone")
             - EVENT: Specific and Material Events (e.g., "Olympic Games", "Covid-19")
             - SECTOR: Company sectors or industries (e.g., "Technology sector")
