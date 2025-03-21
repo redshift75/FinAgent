@@ -378,9 +378,10 @@ if __name__ == "__main__":
         #"Which economic concept has the most connections to other entities?"
         #"What is the complete sphere of influence of the U.S. Federal Reserve?"
         #"Identify all potential contagion pathways through which a shock in one market (e.g., housing) could propagate through financial institutions, regulatory responses, credit markets, and eventually impact multiple economic sectors."
-        "How would increased regulation of major technology companies propagate through market valuations, investment patterns, innovation metrics, and eventually impact broader economic indicators?"
+        #"How would increased regulation of major technology companies propagate through market valuations, investment patterns, innovation metrics, and eventually impact broader economic indicators?"
         #"What are the comprehensive multi-layer impacts of NAFTA/USMCA changes on cross-border supply chains, manufacturing employment, consumer prices, and regional economic competitiveness?"
         #"What is the impact of the USMCA on the US economy?"
+        "What were the ramifications of the tech bubble burst?"
     ]
 
 
